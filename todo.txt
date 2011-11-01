@@ -1,0 +1,8 @@
+Change map<string, State> to be vector <int>
+Flexible processing of state parameters
+Clean up of all methods and functions, with commenting.
+Separation of live/immigrants/emigrants/dead individuals.
+More realistic initialisers.
+Mating algorithm.
+Birth algorithm.
+Monte Carlo

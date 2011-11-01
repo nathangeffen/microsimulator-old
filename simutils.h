@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
+#include <random>
 #include <iostream>
 
 #define PARM(X) (*stateParameters_[Parameter(X)])()
@@ -61,10 +61,13 @@ const double MONTH = 365.0 / 12.0;
 const double YEAR = 365.0;
 const int defaultNumberIndividuals = 10000;
 const int defaultNumberIterations = 70;
+static mt19937 mersenne_twister;
+
 
 // Utility functions
 double always_true();
-double frand();
+double frand(uniform_real_distribution<> dist=uniform_real_distribution<>(0,1));
+
 
 template <class FilterContainer>
 bool passesFilters(const StateValueMap& stateValueMap,

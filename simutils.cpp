@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+
 #include "simutils.h"
 #include "state_parameter.h"
 #include "state.h"
@@ -41,8 +42,9 @@ double microsimulator::normalize_compounded_proportion(double proportion,
   return exp(log(c)/n) - 1;
 }
 
-double microsimulator::frand() {
-  return (double) rand() / (double) RAND_MAX;
+double microsimulator::frand(uniform_real_distribution<> dist)
+{
+  return dist(mersenne_twister);
 }
 
 double microsimulator::always_true()
