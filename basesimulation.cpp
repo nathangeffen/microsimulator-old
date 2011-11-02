@@ -126,14 +126,17 @@ void BaseSimulation::setTimePeriod(double timePeriod_)
 }
 
 
-void BaseSimulation::addState(string name, State* const state,
+int BaseSimulation::addState(string name, State* const state,
           bool markForDeletion)
 {
+  int stateCounter = stateCounter_;
   states_[name] = state;
   stateOrder_.push_back(name);
   if (markForDeletion) {
     statesToDelete_.push_back(name);
   }
+  ++stateCounter_;
+  return stateCounter;
 }
 
 void BaseSimulation::addAnalysisDescriptor(string analysisName, string stateName,

@@ -34,7 +34,8 @@ public:
     nIndividuals_(nIndividuals),
     nIterations_(nIterations),
     timePeriod_(timePeriod),
-    states_(states)   {};
+    states_(states),
+    stateCounter_(0) {};
   ~BaseSimulation();
 
   virtual void prepare();
@@ -53,7 +54,7 @@ public:
   void setIndividuals(int nIndividuals_);
   void setIterations(int nIterations_);
   void setTimePeriod(double timePeriod_);
-  void addState(string name, State* const state, bool markForDeletion=false);
+  int addState(string name, State* const state, bool markForDeletion=false);
   void addAnalysisDescriptor(string AnalysisName, string stateName,
       AnalysisFunction function,
       FilterFunctionList filters=emptyFilterFunctionVector);
@@ -67,6 +68,8 @@ protected:
   vector<string> stateOrder_;
   vector<string> statesToDelete_;
   AnalysisDescriptorList analysisDescriptors_;
+private:
+  int stateCounter_;
 };
 
 }
