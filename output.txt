@@ -1,0 +1,19 @@
+Individuals: 20000
+Iterations: 70
+Time Period: 12
+Preparing tb simulation
+Simulating tb
+Simulation tb finished
+DESCRIPTIONS
+Number of people alive with tb 264
+Number of people who died with tb 0
+Mean age of the living 2.30137
+Mean age of the dead 1.12671
+Median age of the living 2.30137
+Median age of the dead 1.08493
+Number of people alive 19952
+Number of living people who've had active TB 459
+Number of people who've had active TB 459
+Mean number of times people with active TB infected 1.00871
+population 20000
+END
