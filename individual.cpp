@@ -9,24 +9,17 @@
 
 using namespace microsimulator;
 
-void Individual::initializeStateValue(string stateName, double value)
+void Individual::initializeStateValue(double value)
 {
-  stateValues_.insert(pair<string, double>(stateName, value));
+  stateValues_.push_back(value);
 }
 
-void Individual::setStateValue(string stateName, double value)
+void Individual::setStateValue(int stateIndex, double value)
 {
-  stateValues_[stateName] = value;
+  stateValues_[stateIndex] = value;
 }
 
-double Individual::getStateValue(string stateName) const
+double Individual::getStateValue(int stateIndex) const
 {
-
-  auto it = stateValues_.find(stateName);
-  if (it != stateValues_.end())
-  {
-    return it->second;
-  } else {
-    return 0.0;
-  }
+  return stateValues_[stateIndex];
 }

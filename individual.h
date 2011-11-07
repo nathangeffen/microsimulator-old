@@ -20,13 +20,13 @@ class Individual
 {
 public:
   Individual() {};
-  void initializeStateValue(string stateName, double value);
-  void setStateValue(string stateName, double value);
-  double getStateValue(string StateName) const;
-  StateValueMap* getStateValues() {return &stateValues_;};
+  void initializeStateValue(double value);
+  void setStateValue(int stateIndex, double value);
+  double getStateValue(int stateIndex) const;
+  StateValueVector* getStateValues() {return &stateValues_;};
 
 private:
-  StateValueMap stateValues_;
+  StateValueVector stateValues_;
 };
 
 }

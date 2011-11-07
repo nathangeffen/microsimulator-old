@@ -25,17 +25,29 @@ public:
   enum Parameter {
     DEFAULT_PARAMETER=0
   };
-  State() : initializeFunction_(0), transitionFunction_(0) {};
+  State(string name="", int id=0) :
+      initializeFunction_(0),
+      transitionFunction_(0),
+      name_(name),
+      id_(id)
+  {};
   virtual double initialize();
   void setInitializeFunction(const InitializeFunction f);
-  virtual double transition(double value, StateMap& states,
+  virtual double transition(double value, StateVector& states,
       IndividualVector& individuals, Individual& individual);
+  //virtual StateDescriptorVector listRequiredStates();
+  virtual void registerRequiredState(string stateName, int indexTo) {};
+  virtual void prepare(double timePeriod);
   void normalizeParameters(double timePeriod);
   void setTransitionFunction(const TransitionFunction f);
   void setParameterValue(Parameter parameter, double value);
+  void setName(const string& name);
+  void setId(int id);
   void addFilterFunction(On o);
   double getParameterValue(Parameter parameter) const;
   double getParameterNormalizedValue(Parameter parameter) const;
+  string getName() const;
+  int getId() const;
   FilterFunctionList* getFilterFunctions();
 
 protected:
@@ -43,6 +55,8 @@ protected:
   TransitionFunction transitionFunction_;
   FilterFunctionList filterFunctions_;
   map <int, StateParameter*> stateParameters_;
+  string name_;
+  int id_;
 };
 
 
@@ -54,11 +68,13 @@ public:
   };
   StateAge(StateParameter ageIncrement=
       StateParameter(1, YEAR, normalize_linear_proportion));
-  virtual double transition(double value, StateMap& states,
+  virtual double transition(double value, StateVector& states,
       IndividualVector& individuals, Individual& individual);
-
+  virtual void registerRequiredState(string stateName, int stateIndex);
 protected:
   StateParameter ageIncrement_;
+private:
+  int aliveStateIndex_;
 };
 
 }

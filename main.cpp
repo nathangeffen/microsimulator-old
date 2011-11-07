@@ -44,6 +44,14 @@ int main(int argc, char *argv[]) {
   s1.addState("active tb", &activeTb);
   s1.addState("number active tb", &numberActiveTb);
   s1.addState("age", &age);
+  alive.registerRequiredState("active tb", activeTb.getId());
+  alive.registerRequiredState("age", age.getId());
+  alive.registerRequiredState("alive", alive.getId());
+  activeTb.registerRequiredState("alive", alive.getId());
+  activeTb.registerRequiredState("number active tb", numberActiveTb.getId());
+  age.registerRequiredState("alive", alive.getId());
+
+
 
   s1.setTimePeriod(timePeriod);
   s1.setIndividuals(nIndividuals);
@@ -58,29 +66,29 @@ int main(int argc, char *argv[]) {
   AnalysisOutput s1Output;
 
   s1.addAnalysisDescriptor("Number of people alive with tb",
-      "active tb", count, {On("alive"), On("active tb")});
+      activeTb.getId(), count, {On(alive.getId()), On(activeTb.getId())});
   s1.addAnalysisDescriptor("Number of people who died with tb",
-      "active tb", count, {Off("alive")});
+      activeTb.getId(), count, {Off(alive.getId())});
   s1.addAnalysisDescriptor("Mean age of the living",
-      "age", mean, {On("alive")});
+      age.getId(), mean, {On(alive.getId())});
   s1.addAnalysisDescriptor("Mean age of the dead",
-      "age", mean, {Off("alive")});
+      age.getId(), mean, {Off(alive.getId())});
   s1.addAnalysisDescriptor("Median age of the living",
-      "age", median, {On("alive")});
+      age.getId(), median, {On(alive.getId())});
   s1.addAnalysisDescriptor("Median age of the dead",
-      "age", median, {Off("alive")});
-  s1.addAnalysisDescriptor("Number of people alive", "alive", count);
+      age.getId(), median, {Off(alive.getId())});
+  s1.addAnalysisDescriptor("Number of people alive", alive.getId(), count);
   s1.addAnalysisDescriptor("Number of living people who've had active TB",
-      "number active tb", count, {On("alive")});
+      numberActiveTb.getId(), count, {On(alive.getId())});
   s1.addAnalysisDescriptor("Number of people who've had active TB",
-      "number active tb", count);
+      numberActiveTb.getId(), count);
   s1.addAnalysisDescriptor("Mean number of times people with active TB infected",
-      "number active tb", mean, {On("number active tb")});
+      numberActiveTb.getId(), mean, {On(numberActiveTb.getId())});
   s1Output = s1.analyze();
 
   cout << "DESCRIPTIONS" << endl;
   for (auto it : s1Output) {
-    cout << it.description << " " << it.value<< endl;
+    cout << it.description << " " << it.value << endl;
   }
 
   cout << "END" << endl;

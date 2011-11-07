@@ -25,12 +25,16 @@ public:
           StateParameter(0.01, YEAR),
       StateParameter active_tb_cure=
           StateParameter(0.7, YEAR));
-  virtual double transition(double value, StateMap& states,
+  virtual void registerRequiredState(string stateName, int stateIndex);
+  virtual void prepare(double timePeriod) throw(UnregisteredState);
+  virtual double transition(double value, StateVector& states,
       IndividualVector& individuals, Individual& individual);
 
 protected:
   StateParameter active_tb_risk_;
   StateParameter active_tb_cure_;
+  int aliveStateIndex_;
+  int numberActiveTbIndex_;
 };
 
 
@@ -53,7 +57,9 @@ public:
       StateParameter tb_risk_age_61=
           StateParameter(0.8, YEAR)
   );
-  double transition(double value, StateMap& states,
+  virtual void registerRequiredState(string stateName, int stateIndex);
+  virtual void prepare(double timePeriod) throw(UnregisteredState);
+  double transition(double value, StateVector& states,
       IndividualVector& individuals, Individual& individual);
 
 protected:
@@ -61,6 +67,9 @@ protected:
   StateParameter age_61_;
   StateParameter tb_risk_age_0_60_;
   StateParameter tb_risk_age_61_;
+  int ageStateIndex_;
+  int aliveStateIndex_;
+  int tbStateIndex_;
 };
 
 }

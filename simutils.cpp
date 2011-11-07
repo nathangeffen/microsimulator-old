@@ -55,40 +55,34 @@ double microsimulator::always_true()
 
 // Common filters
 
-bool On::operator()(const StateValueMap& stateValues) const
+bool On::operator()(const StateValueVector& stateValues)
 {
-  auto it = stateValues.find(stateName_);
-  if ( it != stateValues.end() ) {
-    if (it->second) {
+  if (stateValues[stateIndex_]) {
       return (on_) ? true : false; // On returns true && Off returns false
-    }
   }
+
   return (on_) ? false : true; // On returns false && Off returns true
 }
 
-double microsimulator::mean(string& stateName,
-                                          IndividualVector& individuals)
+double microsimulator::mean(int stateIndex,
+                            IndividualVector& individuals)
 
 {
   double output = 0.0;
-  int count = 0;
-  for (IndividualVector::iterator it = individuals.begin();
-       it != individuals.end();
-       ++it) {
-    ++count;
-    output += it->getStateValue(stateName);
+  for (auto it : individuals) {
+    output += it.getStateValue(stateIndex);
   }
-  output /= count;
+  output /= individuals.size();
   return output;
 }
 
-double microsimulator::median(string& stateName,
-                                            IndividualVector& individuals)
+double microsimulator::median(int stateIndex,
+                              IndividualVector& individuals)
 
 {
   sort(individuals.begin(), individuals.end(),
-    [&stateName](const Individual& a, const Individual& b) {
-      return a.getStateValue(stateName) < b.getStateValue(stateName);
+    [&stateIndex](const Individual& a, const Individual& b) {
+      return a.getStateValue(stateIndex) < b.getStateValue(stateIndex);
     });
 
   int size = individuals.size();
@@ -96,40 +90,39 @@ double microsimulator::median(string& stateName,
   if (!size)
     output = 0.0;
   else if (size == 1)
-    output = individuals[0].getStateValue(stateName);
+    output = individuals[0].getStateValue(stateIndex);
   else if (size % 2 == 0)
-      output = (individuals[size / 2].getStateValue(stateName) +
-        individuals[size / 2 + 1].getStateValue(stateName)) / 2.0;
+      output = (individuals[size / 2].getStateValue(stateIndex) +
+        individuals[size / 2 + 1].getStateValue(stateIndex)) / 2.0;
   else
-    output = individuals[size / 2 + 1].getStateValue(stateName);
+    output = individuals[size / 2 + 1].getStateValue(stateIndex);
 
   return output;
 }
 
 
-double microsimulator::count(string& stateName,
-                                           IndividualVector& individuals)
+double microsimulator::count(int stateIndex,
+                             IndividualVector& individuals)
 
 {
   int output = 0;
-  for (IndividualVector::iterator it = individuals.begin();
-       it != individuals.end();
-       ++it) {
-    if (it->getStateValue(stateName)) {
+  for (auto it : individuals) {
+    if (it.getStateValue(stateIndex)) {
       ++output;
     }
   }
-  string description = "count:" + stateName;
   return  output;
 }
 
 double microsimulator::defaultTransitionFunction(double value,
-                                 StateMap& states,
+                                 StateVector& states,
                                  ParameterMap& parameters)
 {
   if (value) {
     if (parameters["transition_back"]() < frand()) {
       return 0.0;
+    } else {
+      return 1.0;
     }
   }
 
@@ -141,7 +134,7 @@ double microsimulator::defaultTransitionFunction(double value,
 }
 
 double microsimulator::aliveStateTransition(double value,
-                                 StateMap& states,
+                                 StateVector& states,
                                  ParameterMap& parameters)
 {
   if (parameters["probability_death"]() < frand() ) {
@@ -152,7 +145,7 @@ double microsimulator::aliveStateTransition(double value,
 }
 
 double microsimulator::ageStateTransition(double value,
-                                 StateMap& states,
+                                 StateVector& states,
                                  ParameterMap& parameters)
 {
   return value + parameters["age_increment"]();
