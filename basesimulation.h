@@ -21,7 +21,7 @@
 namespace microsimulator {
 
 const ParameterMap emptyParameterMap;
-const StateMap emptyStateMap;
+const StateVector emptyStateVector;
 const FilterFunctionList emptyFilterFunctionVector;
 
 class BaseSimulation
@@ -30,13 +30,13 @@ public:
   BaseSimulation (int nIndividuals=defaultNumberIndividuals,
               int nIterations=defaultNumberIterations,
               double timePeriod=YEAR,
-              const StateMap& states=emptyStateMap) :
+              const StateVector& states=emptyStateVector) :
     nIndividuals_(nIndividuals),
     nIterations_(nIterations),
     timePeriod_(timePeriod),
     states_(states),
     stateCounter_(0) {};
-  ~BaseSimulation();
+  virtual ~BaseSimulation();
 
   virtual void prepare();
   void simulate();
@@ -55,19 +55,20 @@ public:
   void setIterations(int nIterations_);
   void setTimePeriod(double timePeriod_);
   int addState(string name, State* const state, bool markForDeletion=false);
-  void addAnalysisDescriptor(string AnalysisName, string stateName,
-      AnalysisFunction function,
-      FilterFunctionList filters=emptyFilterFunctionVector);
+  void addAnalysisDescriptor(string AnalysisName,
+                             int stateIndex,
+                             AnalysisFunction function,
+                             FilterFunctionList filters=
+                                                     emptyFilterFunctionVector);
 
 protected:
   int nIndividuals_;
   int nIterations_;
   double timePeriod_;
   IndividualVector individuals_;
-  StateMap states_;
-  vector<string> stateOrder_;
-  vector<string> statesToDelete_;
-  AnalysisDescriptorList analysisDescriptors_;
+  StateVector states_;
+  vector<int> statesToDelete_;
+  AnalysisDescriptorVector analysisDescriptors_;
 private:
   int stateCounter_;
 };

@@ -13,6 +13,7 @@
 #include <map>
 #include <random>
 #include <iostream>
+#include <exception>
 
 #define PARM(X) (*stateParameters_[Parameter(X)])()
 #define MATCH(X, Y)   stateParameters_.insert(pair<int, StateParameter*>( \
@@ -29,6 +30,11 @@ struct OutputDescriptor {
   double value;
 };
 
+struct StateDescriptor {
+  string stateName;
+  string description;
+};
+
 class StateParameter;
 class State;
 class Individual;
@@ -37,20 +43,23 @@ class On;
 
 
 typedef map<string, StateParameter> ParameterMap;
-typedef map<string, State*> StateMap;
+typedef int StateIndex; // Not yet in use
+typedef vector<State*> StateVector;
 typedef map<string, double> StateValueMap;
 //typedef bool (*FilterFunction)(const StateValueMap&);
 typedef vector <On> FilterFunctionList;
 typedef double (*InitializeFunction)();
 typedef double (*NormalizeFunction)(double, double, double);
 typedef vector<Individual> IndividualVector;
-typedef double (*AnalysisFunction) (string&, IndividualVector&);
-typedef tuple <string, string, AnalysisFunction, FilterFunctionList>
+typedef double (*AnalysisFunction) (int, IndividualVector&);
+typedef tuple <string, int, AnalysisFunction, FilterFunctionList>
               AnalysisDescriptor;
-typedef vector < AnalysisDescriptor > AnalysisDescriptorList;
+typedef vector < AnalysisDescriptor > AnalysisDescriptorVector;
 typedef vector<OutputDescriptor> AnalysisOutput;
-typedef double (*TransitionFunction) (double, StateMap&, IndividualVector&,
+typedef double (*TransitionFunction) (double, StateVector&, IndividualVector&,
     Individual&);
+typedef vector <double> StateValueVector;
+typedef vector <StateDescriptor> StateDescriptorVector;
 
 const double SECOND = 1.0 / (24.0 * 60.0 * 60.0);
 const double MINUTE = 1.0 / (24.0 * 60.0);
@@ -70,11 +79,11 @@ double frand(uniform_real_distribution<> dist=uniform_real_distribution<>(0,1));
 
 
 template <class FilterContainer>
-bool passesFilters(const StateValueMap& stateValueMap,
+bool passesFilters(const StateValueVector& stateValueVector,
                    const FilterContainer& filters)
 {
   for (auto f : filters) {
-    if (not f(stateValueMap)) {
+    if (not f(stateValueVector)) {
       return false;
     }
   }
@@ -86,10 +95,10 @@ bool passesFilters(const StateValueMap& stateValueMap,
 class On
 {
 public:
-  On(const string& stateName, bool on=true) : stateName_(stateName), on_(on) {};
-  bool operator()(const StateValueMap& stateValues) const;
+  On(int stateIndex, bool on=true) : stateIndex_(stateIndex), on_(on) {};
+  bool operator()(const StateValueVector& stateValues);
 protected:
-  string stateName_;
+  int stateIndex_;
   bool on_;
 };
 
@@ -102,19 +111,29 @@ double normalize_compounded_proportion(double proportion,
                                        double fromTimePeriod,
                                        double toTimePeriod);
 
-double count(string& stateName, IndividualVector& individuals);
-double mean(string& stateName, IndividualVector& individuals);
-double median(string& stateName, IndividualVector& individuals);
+double count(int stateIndex, IndividualVector& individuals);
+double mean(int stateIndex, IndividualVector& individuals);
+double median(int stateIndex, IndividualVector& individuals);
 
 double defaultTransitionFunction(double value,
-                                 StateMap& states,
+                                 StateVector& states,
                                  ParameterMap& parameters);
 double aliveStateTransition(double value,
-                                 StateMap& states,
+                                 StateVector& states,
                                  ParameterMap& parameters);
 double ageStateTransition(double value,
-                          StateMap& states,
+                          StateVector& states,
                           ParameterMap& parameters);
 }
+
+// Exceptions
+
+class UnregisteredState: public exception
+{
+  virtual const char* what() const throw()
+  {
+    return "A state has not been registered";
+  }
+};
 
 #endif /* SIMUTILS_H_ */

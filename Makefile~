@@ -1,10 +1,9 @@
 CC=g++
-CFLAGS=-c -Wall -std=c++0x -O2
+CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=basesimulation.cpp simutils.cpp TbSimulation.cpp individual.cpp \
-	state.cpp  tb_states.cpp main.cpp state_parameter.cpp
+SOURCES=main.cpp  basesimulation.cpp d TSHISAv1.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=microsimulator
+EXECUTABLE=stihiv
 
 all: $(SOURCES) $(EXECUTABLE)
 	

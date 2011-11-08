@@ -25,17 +25,46 @@ StateActiveTb::StateActiveTb(
   stateParameters_.insert(pair<int, StateParameter*>(
       Parameter(ACTIVE_TB_CURE),
       &active_tb_cure_));
-
-  filterFunctions_.push_back(On("alive"));
+  aliveStateIndex_ = -1;
+  numberActiveTbIndex_ = -1;
 }
 
-double StateActiveTb::transition(double value, StateMap& states,
+
+void StateActiveTb::registerRequiredState(string stateName,
+                                                  int stateIndex)
+{
+  if ( stateName == "alive" ) {
+    aliveStateIndex_ = stateIndex;
+    filterFunctions_.push_back(On(aliveStateIndex_));
+  } else
+  if ( stateName == "number active tb" ) {
+    numberActiveTbIndex_ = stateIndex;
+  }
+}
+
+void StateActiveTb::prepare(double timePeriod) throw(UnregisteredState)
+{
+  if ( numberActiveTbIndex_ == -1 ) {
+    cerr << "Please register 'number active tb' state with 'active tb' state." << endl;
+    throw UnregisteredState();
+  }
+  if ( aliveStateIndex_ == -1 ) {
+    cerr << "Please register 'alive' state with 'active tb' state." << endl;
+    throw UnregisteredState();
+  }
+
+  filterFunctions_.push_back(On(aliveStateIndex_));
+  State::prepare(timePeriod);
+}
+
+
+double StateActiveTb::transition(double value, StateVector& states,
     IndividualVector& individuals, Individual& individual)
 {
   if (!value) {
     if (frand() < PARM(ACTIVE_TB_RISK)) {
-      double noTimesInfected = individual.getStateValue("number active tb");
-      individual.setStateValue("number active tb", noTimesInfected + 1.0);
+      double noTimesInfected = individual.getStateValue(numberActiveTbIndex_);
+      individual.setStateValue(numberActiveTbIndex_, noTimesInfected + 1.0);
       return 1;
     } else {
       return 0;
@@ -62,6 +91,7 @@ StateAlive::StateAlive(
     tb_risk_age_0_60_(tb_risk_age_0_60),
     tb_risk_age_61_(tb_risk_age_61)
 {
+  tbStateIndex_ = ageStateIndex_ = aliveStateIndex_ = -1;
   stateParameters_.insert(pair<int, StateParameter*>(
       Parameter(AGE_0_60), &age_0_60_));
 
@@ -74,19 +104,52 @@ StateAlive::StateAlive(
   stateParameters_.insert(pair<int, StateParameter*>(
       Parameter(TB_RISK_AGE_61), &tb_risk_age_61_));
   initializeFunction_ = always_true;
-  filterFunctions_.push_back(On("alive"));
 }
 
-double StateAlive::transition(double value, StateMap& states,
+void StateAlive::registerRequiredState(string stateName, int stateIndex)
+{
+  if ( stateName == "active tb" ) {
+    tbStateIndex_ = stateIndex;
+  } else
+  if ( stateName == "age"  ) {
+    ageStateIndex_ = stateIndex;
+  } else
+  if ( stateName == "alive" ) {
+    aliveStateIndex_ = stateIndex;
+  }
+}
+
+void StateAlive::prepare(double timePeriod) throw(UnregisteredState)
+{
+  if ( aliveStateIndex_ == -1 )
+    aliveStateIndex_ = id_;
+  if ( ageStateIndex_ == -1 ) {
+    cerr << "Please register 'age' state with 'alive' state." << endl;
+    throw UnregisteredState();
+  }
+  if ( ageStateIndex_ == -1 ) {
+    cerr << "Please register 'age' state with 'alive' state." << endl;
+    throw UnregisteredState();
+  }
+  if ( tbStateIndex_ == -1 ) {
+    cerr << "Please register 'active tb' state with 'alive' state." << endl;
+    throw UnregisteredState();
+  }
+
+  filterFunctions_.push_back(On(aliveStateIndex_));
+  State::prepare(timePeriod);
+}
+
+double StateAlive::transition(double value, StateVector& states,
     IndividualVector& individuals, Individual& individual)
 {
   if (!value) {// Once you're dead, you're dead
-    return 0;
+    return 0.0;
   }
 
   // 0-60 and no TB
-  if (individual.getStateValue("active TB") == 0) {
-    if (individual.getStateValue("age") <= 60) {
+  if (individual.getStateValue(tbStateIndex_) == 0) {
+    if (individual.getStateValue(ageStateIndex_) <= 60) {
       if(frand() < PARM(AGE_0_60)) {
         return 0.0;
       } else {
@@ -96,8 +159,8 @@ double StateAlive::transition(double value, StateMap& states,
   }
 
   // No TB and age >60
-  if (individual.getStateValue("active TB") == 0) {
-    if (individual.getStateValue("age") > 60) {
+  if (individual.getStateValue(tbStateIndex_) == 0) {
+    if (individual.getStateValue(ageStateIndex_) > 60) {
       if(frand() < PARM(AGE_61)) {
         return 0.0;
       } else {
@@ -107,7 +170,7 @@ double StateAlive::transition(double value, StateMap& states,
   }
 
   // TB and age <= 60
-  if (individual.getStateValue("age") <= 60) {
+  if (individual.getStateValue(ageStateIndex_) <= 60) {
     if(frand() < PARM(TB_RISK_AGE_0_60)) {
         return 0.0;
     } else {
@@ -116,7 +179,7 @@ double StateAlive::transition(double value, StateMap& states,
   }
 
   // TB and age > 60
-  if (individual.getStateValue("age") > 60) {
+  if (individual.getStateValue(ageStateIndex_) > 60) {
     if(frand() < PARM(TB_RISK_AGE_61)) {
         return 0.0;
     } else {

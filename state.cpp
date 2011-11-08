@@ -27,6 +27,11 @@ double State::initialize() {
   return 0.0;
 }
 
+void State::prepare(double timePeriod)
+{
+  this->normalizeParameters(timePeriod);
+}
+
 void State::normalizeParameters(double timePeriod)
 {
   map <int, StateParameter*>::iterator it;
@@ -36,7 +41,7 @@ void State::normalizeParameters(double timePeriod)
 }
 
 
-double State::transition(double value, StateMap& states,
+double State::transition(double value, StateVector& states,
     IndividualVector& individuals, Individual& individual)
 {
   if (transitionFunction_) {
@@ -88,17 +93,37 @@ FilterFunctionList* State::getFilterFunctions()
   return &filterFunctions_;
 }
 
+void State::setName(const string& name)
+{
+  name_ = name;
+}
+
+void State::setId(int id)
+{
+  id_ = id;
+}
+
+string State::getName() const
+{
+  return name_;
+}
+
+int State::getId() const
+{
+  return id_;
+}
+
+
 /////////////////////
 
 StateAge::StateAge(StateParameter ageIncrement) :
       ageIncrement_(ageIncrement)
 {
   MATCH(AGE_INCREMENT, ageIncrement_);
-  filterFunctions_.push_back(On("alive"));
+  aliveStateIndex_ = -1;
 }
 
-
-double StateAge::transition(double value, StateMap& states,
+double StateAge::transition(double value, StateVector& states,
     IndividualVector& individuals, Individual& individual)
 {
   if (transitionFunction_) {
@@ -106,4 +131,15 @@ double StateAge::transition(double value, StateMap& states,
   }
 
   return value + PARM(AGE_INCREMENT);
+}
+
+void StateAge::registerRequiredState(string stateName, int stateIndex)
+{
+  if ( stateName == "alive" ) {
+    if (aliveStateIndex_ > -1) {
+      // Put code here to delete the alive state filter
+    }
+    aliveStateIndex_ = stateIndex;
+    filterFunctions_.push_back(On(aliveStateIndex_));
+  }
 }
