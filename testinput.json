@@ -1,0 +1,105 @@
+{
+    "state": {
+        "name": "alive",
+        "transitionrecord" : {
+            "transitionentry" : {
+                "matchstatename": "age",
+                "matchfunction": "gte_lt",
+                "lower": 0,
+                "upper": 1
+            },
+            "transitionentry": {
+                "matchstatename": "tb",
+                "matchfunction": "eq",
+                "lower": 1
+            },
+	    "probability": {
+                "value": 0.3,
+                "timeperiod": 365.25,
+                "normalizeFunction": "ncp"
+            },
+            "newwalue": {
+                "value": 0,
+                "timeperiod": 365.25,
+                "normalizeFunction": null,
+                "assignFunction": "assign"
+            }
+        },
+        "transitionrecord" : {
+            "transitionentry": {
+                "matchstatename": "age",
+                "matchfunction": "gte_lt",
+                "lower": 0,
+                "upper": 1
+            },
+	    "probability": {
+                "value": 0.01,
+                "timeperiod": 365.25,
+                "normalizeFunction": "ncp"
+            },
+            "newwalue": {
+                "value": 0,
+                "timeperiod": 365.25,
+                "normalizeFunction": null,
+                "assignFunction": "assign"
+            }
+        },
+        "transitionrecord" : {
+            "transitionentry" : {
+                "matchstatename": "age",
+                "matchfunction": "gte_lt",
+                "lower": 1,
+                "upper": 5
+            },
+            "transitionentry": {
+                "matchstatename": "tb",
+                "matchfunction": "eq",
+                "lower": 1
+            },
+	    "probability": {
+                "value": 0.1,
+                "timeperiod": 365.25,
+                "normalizeFunction": "ncp"
+            },
+            "newwalue": {
+                "value": 0,
+                "timeperiod": 365.25,
+                "normalizeFunction": null,
+                "assignFunction": "assign"
+            }
+        },
+        "transitionrecord" : {
+            "transitionentry" : {
+                "matchstatename": "age",
+                "matchfunction": "gte_lt",
+                "lower": 1,
+                "upper": 5
+            },
+	    "probability": {
+                "value": 0.001,
+                "timeperiod": 365.25,
+                "normalizeFunction": "ncp"
+            },
+            "newwalue": {
+                "value": 0,
+                "timeperiod": 365.25,
+                "normalizeFunction": null,
+                "assignFunction": "assign"
+            }
+        },
+        "transitionrecord" : {
+	    "probability": {
+                "value": 0.01,
+                "timeperiod": 365.25,
+                "normalizeFunction": "ncp"
+            },
+            "newwalue": {
+                "value": 1,
+                "timeperiod": 365.25,
+                "normalizeFunction": null,
+                "assignFunction": "assign"
+            }
+        }
+    }
+}
+

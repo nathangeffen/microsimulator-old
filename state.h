@@ -10,7 +10,6 @@
 
 #include <map>
 #include <vector>
-#include <set>
 
 #include "simutils.h"
 #include "state_parameter.h"
@@ -19,31 +18,43 @@ using namespace std;
 
 namespace microsimulator {
 
+// This class encapsulates a simulation state. A Simulation has multiple states.
+// A simulation also consists of multiple individuals.
+// Each individual in the simulation has a value for each state.
+
 class State
 {
 public:
+
+  // Parameters used by the State are stored in the Parameter enumeration
   enum Parameter {
     DEFAULT_PARAMETER=0
   };
-  State(string name="", int id=0) :
-      initializeFunction_(0),
-      transitionFunction_(0),
-      name_(name),
-      id_(id)
-  {};
+  State( string name="", int id=0 );
+  virtual ~State() {};
+
+  // Determine the initial value for a state for a particular individual.
   virtual double initialize();
-  void setInitializeFunction(const InitializeFunction f);
-  virtual double transition(double value, StateVector& states,
-      IndividualVector& individuals, Individual& individual);
-  //virtual StateDescriptorVector listRequiredStates();
+
+  // Given a value for an individual's state, this method calculates what the
+  // new value should be.
+  virtual double transition(double value,
+                            StateVector& states,
+                            IndividualVector& individuals,
+                            Individual& individual);
+
   virtual void registerRequiredState(string stateName, int indexTo) {};
   virtual void prepare(double timePeriod);
   void normalizeParameters(double timePeriod);
+
+  void addFilterFunction(On o);
+
+  void setInitializeFunction(const InitializeFunction f);
   void setTransitionFunction(const TransitionFunction f);
   void setParameterValue(Parameter parameter, double value);
   void setName(const string& name);
   void setId(int id);
-  void addFilterFunction(On o);
+
   double getParameterValue(Parameter parameter) const;
   double getParameterNormalizedValue(Parameter parameter) const;
   string getName() const;
@@ -57,24 +68,6 @@ protected:
   map <int, StateParameter*> stateParameters_;
   string name_;
   int id_;
-};
-
-
-class StateAge : public State
-{
-public:
-  enum Parameter {
-    AGE_INCREMENT=1
-  };
-  StateAge(StateParameter ageIncrement=
-      StateParameter(1, YEAR, normalize_linear_proportion));
-  virtual double transition(double value, StateVector& states,
-      IndividualVector& individuals, Individual& individual);
-  virtual void registerRequiredState(string stateName, int stateIndex);
-protected:
-  StateParameter ageIncrement_;
-private:
-  int aliveStateIndex_;
 };
 
 }

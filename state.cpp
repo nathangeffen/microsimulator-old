@@ -15,16 +15,27 @@
 using namespace std;
 using namespace microsimulator;
 
-void State::setInitializeFunction(const InitializeFunction f)
-{
-  this->initializeFunction_ = f;
-}
+State::State(string name, int id) :
+    initializeFunction_(0),
+    transitionFunction_(0),
+    name_(name),
+    id_(id)
+{};
 
 double State::initialize() {
   if (initializeFunction_) {
     return initializeFunction_();
   }
   return 0.0;
+}
+
+double State::transition(double value, StateVector& states,
+    IndividualVector& individuals, Individual& individual)
+{
+  if (transitionFunction_) {
+    return transitionFunction_(value, states, individuals, individual);
+  }
+  return value;
 }
 
 void State::prepare(double timePeriod)
@@ -40,14 +51,14 @@ void State::normalizeParameters(double timePeriod)
   }
 }
 
-
-double State::transition(double value, StateVector& states,
-    IndividualVector& individuals, Individual& individual)
+void State::addFilterFunction(On o)
 {
-  if (transitionFunction_) {
-    return transitionFunction_(value, states, individuals, individual);
-  }
-  return value;
+  filterFunctions_.push_back(o);
+}
+
+void State::setInitializeFunction(const InitializeFunction f)
+{
+  this->initializeFunction_ = f;
 }
 
 void State::setTransitionFunction(const TransitionFunction f)
@@ -60,9 +71,14 @@ void State::setParameterValue(Parameter parameter, double value)
   stateParameters_[parameter]->setValue(value);
 }
 
-void State::addFilterFunction(On o)
+void State::setName(const string& name)
 {
-  filterFunctions_.push_back(o);
+  name_ = name;
+}
+
+void State::setId(int id)
+{
+  id_ = id;
 }
 
 double State::getParameterValue(Parameter parameter) const
@@ -87,22 +103,6 @@ double State::getParameterNormalizedValue(Parameter parameter) const
   return 0.0;
 }
 
-
-FilterFunctionList* State::getFilterFunctions()
-{
-  return &filterFunctions_;
-}
-
-void State::setName(const string& name)
-{
-  name_ = name;
-}
-
-void State::setId(int id)
-{
-  id_ = id;
-}
-
 string State::getName() const
 {
   return name_;
@@ -113,33 +113,7 @@ int State::getId() const
   return id_;
 }
 
-
-/////////////////////
-
-StateAge::StateAge(StateParameter ageIncrement) :
-      ageIncrement_(ageIncrement)
+FilterFunctionList* State::getFilterFunctions()
 {
-  MATCH(AGE_INCREMENT, ageIncrement_);
-  aliveStateIndex_ = -1;
-}
-
-double StateAge::transition(double value, StateVector& states,
-    IndividualVector& individuals, Individual& individual)
-{
-  if (transitionFunction_) {
-    return transitionFunction_(value, states, individuals, individual);
-  }
-
-  return value + PARM(AGE_INCREMENT);
-}
-
-void StateAge::registerRequiredState(string stateName, int stateIndex)
-{
-  if ( stateName == "alive" ) {
-    if (aliveStateIndex_ > -1) {
-      // Put code here to delete the alive state filter
-    }
-    aliveStateIndex_ = stateIndex;
-    filterFunctions_.push_back(On(aliveStateIndex_));
-  }
+  return &filterFunctions_;
 }

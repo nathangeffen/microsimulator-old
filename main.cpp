@@ -10,6 +10,7 @@
 
 #include "basesimulation.h"
 #include "state.h"
+#include "stateage.h"
 #include "tb_states.h"
 
 using namespace std;

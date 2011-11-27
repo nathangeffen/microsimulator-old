@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 #include "simutils.h"
 #include "state_parameter.h"
@@ -41,6 +42,14 @@ double microsimulator::normalize_compounded_proportion(double proportion,
   // Finally subtract the 1 that was added in the previous statement
   return exp(log(c)/n) - 1;
 }
+
+double normalize_identity(double proportion,
+                          double fromTimePeriod,
+                          double toTimePeriod)
+{
+  return proportion;
+}
+
 
 double microsimulator::frand(uniform_real_distribution<> dist)
 {
@@ -150,3 +159,23 @@ double microsimulator::ageStateTransition(double value,
 {
   return value + parameters["age_increment"]();
 }
+
+
+SimulationException::SimulationException(string message,int line, string file)
+{
+    message_ = message;
+    line_ = line;
+    file_ = file;
+    ::exception();
+}
+
+const char* SimulationException::what() const throw()
+{
+  stringstream message;
+
+  message << message_ << " ";
+  if ( line_ && file_ != "" )
+    message << "Error at line " << line_ << " in " << file_;
+  return message.str().c_str();
+}
+

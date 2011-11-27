@@ -16,6 +16,7 @@
 #include "simutils.h"
 #include "individual.h"
 #include "state.h"
+#include "stateage.h"
 #include "state_parameter.h"
 
 namespace microsimulator {

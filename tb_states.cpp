@@ -42,15 +42,13 @@ void StateActiveTb::registerRequiredState(string stateName,
   }
 }
 
-void StateActiveTb::prepare(double timePeriod) throw(UnregisteredState)
+void StateActiveTb::prepare(double timePeriod) throw(SimulationException)
 {
   if ( numberActiveTbIndex_ == -1 ) {
-    cerr << "Please register 'number active tb' state with 'active tb' state." << endl;
-    throw UnregisteredState();
+    throw SimulationException("Please register 'number active tb' state with 'active tb' state.");
   }
   if ( aliveStateIndex_ == -1 ) {
-    cerr << "Please register 'alive' state with 'active tb' state." << endl;
-    throw UnregisteredState();
+    throw SimulationException("Please register 'alive' state with 'active tb' state.");
   }
 
   filterFunctions_.push_back(On(aliveStateIndex_));
@@ -119,21 +117,18 @@ void StateAlive::registerRequiredState(string stateName, int stateIndex)
   }
 }
 
-void StateAlive::prepare(double timePeriod) throw(UnregisteredState)
+void StateAlive::prepare(double timePeriod) throw(SimulationException)
 {
   if ( aliveStateIndex_ == -1 )
     aliveStateIndex_ = id_;
   if ( ageStateIndex_ == -1 ) {
-    cerr << "Please register 'age' state with 'alive' state." << endl;
-    throw UnregisteredState();
+    throw SimulationException("Please register 'age' state with 'alive' state.");
   }
   if ( ageStateIndex_ == -1 ) {
-    cerr << "Please register 'age' state with 'alive' state." << endl;
-    throw UnregisteredState();
+    throw SimulationException("Please register 'age' state with 'alive' state.");
   }
   if ( tbStateIndex_ == -1 ) {
-    cerr << "Please register 'active tb' state with 'alive' state." << endl;
-    throw UnregisteredState();
+    throw SimulationException("Please register 'active tb' state with 'alive' state.");
   }
 
   filterFunctions_.push_back(On(aliveStateIndex_));

@@ -26,7 +26,7 @@ public:
       StateParameter active_tb_cure=
           StateParameter(0.7, YEAR));
   virtual void registerRequiredState(string stateName, int stateIndex);
-  virtual void prepare(double timePeriod) throw(UnregisteredState);
+  virtual void prepare(double timePeriod) throw(SimulationException);
   virtual double transition(double value, StateVector& states,
       IndividualVector& individuals, Individual& individual);
 
@@ -58,7 +58,7 @@ public:
           StateParameter(0.8, YEAR)
   );
   virtual void registerRequiredState(string stateName, int stateIndex);
-  virtual void prepare(double timePeriod) throw(UnregisteredState);
+  virtual void prepare(double timePeriod) throw(SimulationException);
   double transition(double value, StateVector& states,
       IndividualVector& individuals, Individual& individual);
 

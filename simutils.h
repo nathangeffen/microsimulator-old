@@ -61,6 +61,11 @@ typedef double (*TransitionFunction) (double, StateVector&, IndividualVector&,
 typedef vector <double> StateValueVector;
 typedef vector <StateDescriptor> StateDescriptorVector;
 
+enum SimulationFormat {
+  JSON,
+  SQLITE,
+};
+
 const double SECOND = 1.0 / (24.0 * 60.0 * 60.0);
 const double MINUTE = 1.0 / (24.0 * 60.0);
 const double HOUR = 1.0 / 24.0;
@@ -71,7 +76,6 @@ const double YEAR = 365.0;
 const int defaultNumberIndividuals = 10000;
 const int defaultNumberIterations = 70;
 static mt19937 mersenne_twister;
-
 
 // Utility functions
 double always_true();
@@ -110,6 +114,9 @@ double normalize_linear_proportion(double proportion,
 double normalize_compounded_proportion(double proportion,
                                        double fromTimePeriod,
                                        double toTimePeriod);
+double normalize_identity(double proportion,
+                          double fromTimePeriod,
+                          double toTimePeriod);
 
 double count(int stateIndex, IndividualVector& individuals);
 double mean(int stateIndex, IndividualVector& individuals);
@@ -128,12 +135,16 @@ double ageStateTransition(double value,
 
 // Exceptions
 
-class UnregisteredState: public exception
-{
-  virtual const char* what() const throw()
-  {
-    return "A state has not been registered";
-  }
+class SimulationException : public exception {
+public:
+  SimulationException(string message, int line=0, string file="");
+  virtual const char* what() const throw();
+  ~SimulationException() throw () {};
+
+private:
+  string message_;
+  int line_;
+  string file_;
 };
 
 #endif /* SIMUTILS_H_ */
