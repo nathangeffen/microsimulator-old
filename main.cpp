@@ -6,12 +6,15 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <cstdlib>
 
 #include "basesimulation.h"
 #include "state.h"
 #include "stateage.h"
 #include "tb_states.h"
+#include "statetransitiontable.h"
 
 using namespace std;
 
@@ -19,6 +22,29 @@ using namespace microsimulator;
 
 
 int main(int argc, char *argv[]) {
+
+  cout << "Loading transition table" << endl;
+  ifstream jsonfile("testinput.json");
+
+  stringstream jsonstream;
+
+  if (jsonfile.is_open()) {
+    while ( jsonfile.good() ) {
+      string line;
+      getline (jsonfile, line);
+      jsonstream << line << endl;
+    }
+    jsonfile.close();
+  } else {
+    cout << "Unable to open json file" << endl;
+    return 1;
+  }
+
+  StateTransitionTable stateTable;
+
+  stateTable.loadStateTransitionTable(jsonstream.str(), JSON);
+
+  cout << "Finished loading transition table" << endl;
 
   StateActiveTb activeTb;
   StateAlive alive;

@@ -1,3 +1,4 @@
+[
 {
     "state": {
         "name": "alive",
@@ -101,5 +102,27 @@
             }
         }
     }
+},
+{    "state": {
+        "name": "age",
+        "transitionrecord" : {
+            "transitionentry" : {
+                "matchstatename": "alive",
+                "matchfunction": "eq",
+                "lower": 1
+            },
+	    "probability": {
+                "value": 1,
+                "normalizeFunction": null
+            },
+            "newwalue": {
+                "value": 1,
+                "timeperiod": 365.25,
+                "normalizeFunction": null,
+                "assignFunction": "assign"
+            }
+        }
+    } 
 }
+]
 

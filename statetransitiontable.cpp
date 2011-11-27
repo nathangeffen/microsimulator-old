@@ -5,6 +5,7 @@
  *      Author: nathan
  */
 
+#include <iostream>
 #include "simutils.h"
 #include "statetransitiontable.h"
 #include "simplejson/JSON.h"
@@ -17,6 +18,7 @@ void StateTransitionTable::loadStateTransitionTable(
 {
   switch( tableFormat ) {
     case JSON:
+      cout << "JSON Table" << endl;
       loadJsonTransitionTable(inputTable);
       break;
     case SQLITE:
@@ -33,6 +35,9 @@ void StateTransitionTable::loadStateTransitionTable(
 void StateTransitionTable::loadJsonTransitionTable(string inputTable)
 {
   // Parse example data
+
+  cout << "Input Table " << inputTable;
+
   JSONValue *value = JSON::Parse(inputTable.c_str());
 
   // Did it go wrong?
@@ -45,6 +50,29 @@ void StateTransitionTable::loadJsonTransitionTable(string inputTable)
   {
     // Retrieve the main object
     JSONObject root;
+
+    if (value->IsObject() == false)
+    {
+      throw SimulationException("The root element is not an object while "
+                                "parsing Json table.",
+                                __LINE__,
+                                __FILE__);
+    }
+
+    root = value->AsObject();
+
+    if ( root.find(L"state") != root.end()
+         && root[L"state"]->IsObject() ) {
+      wcout << L"STATE 1" << endl;
+      wcout << root[L"state"]->Stringify() << endl << endl;
+    }
+
+
+    if ( root.find(L"state") != root.end()
+         && root[L"state"]->IsObject() ) {
+      wcout << L"STATE 2" << endl;
+      wcout << root[L"state"]->Stringify() << endl << endl;
+    }
   }
 }
 
